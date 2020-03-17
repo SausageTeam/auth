@@ -1,0 +1,39 @@
+{
+  "properties": [
+    {
+      "name": "database.hibernate.driver",
+      "type": "java.lang.String",
+      "description": "Description for database.hibernate.driver."
+    },
+    {
+      "name": "database.hibernate.url",
+      "type": "java.lang.String",
+      "description": "Description for database.hibernate.url."
+    },
+    {
+      "name": "database.hibernate.username",
+      "type": "java.lang.String",
+      "description": "Description for database.hibernate.username."
+    },
+    {
+      "name": "database.hibernate.password",
+      "type": "java.lang.String",
+      "description": "Description for database.hibernate.password."
+    },
+    {
+      "name": "database.hibernate.dialect",
+      "type": "java.lang.String",
+      "description": "Description for database.hibernate.dialect."
+    },
+    {
+      "name": "database.hibernate.showsql",
+      "type": "java.lang.String",
+      "description": "Description for database.hibernate.showsql."
+    },
+    {
+      "name": "services.auth",
+      "type": "java.lang.String",
+      "description": "Description for services.auth."
+    }
+  ]
+}
