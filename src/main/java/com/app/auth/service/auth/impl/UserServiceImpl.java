@@ -1,8 +1,8 @@
-package com.app.auth.service.impl;
+package com.app.auth.service.auth.impl;
 
-import com.app.auth.dao.UserDAO;
-import com.app.auth.domain.auth.LoginDTO;
-import com.app.auth.service.UserService;
+import com.app.auth.dao.User.UserDAO;
+import com.app.auth.domain.login.LoginRequest;
+import com.app.auth.service.auth.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +19,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public boolean loginUser(LoginDTO loginDTO) {
-        return userDAO.loginUser(loginDTO);
+    public boolean loginUser(LoginRequest loginRequest) {
+        return userDAO.getUser(loginRequest) != null;
     }
 
 }

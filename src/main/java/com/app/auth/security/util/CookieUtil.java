@@ -1,4 +1,4 @@
-package com.app.auth.security;
+package com.app.auth.security.util;
 
 import org.springframework.web.util.WebUtils;
 

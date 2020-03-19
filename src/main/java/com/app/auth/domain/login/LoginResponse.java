@@ -1,4 +1,4 @@
-package com.app.auth.domain.auth;
+package com.app.auth.domain.login;
 
 import com.app.auth.domain.common.Status;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AuthResponse {
+public class LoginResponse {
 
     private Status status;
 

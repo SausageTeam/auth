@@ -1,16 +1,18 @@
 package com.app.auth.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "User")
-public class UserInfo implements Serializable {
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,10 +20,10 @@ public class UserInfo implements Serializable {
     private int id;
 
     @Column(name = "USERNAME")
-    private String userName;
+    private String username;
 
     @Column(name = "PASSWORD")
-    private String userPassword;
+    private String password;
 
     @Column(name = "PERSON_ID")
     private int personId;
