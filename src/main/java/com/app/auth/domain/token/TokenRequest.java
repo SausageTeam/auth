@@ -7,6 +7,8 @@ import lombok.Setter;
 @Setter
 public class TokenRequest {
 
+    private String email;
+
     private String token;
 
     private String redirectUrl;

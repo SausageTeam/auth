@@ -12,6 +12,9 @@
 <body>
 <div>
     <form method="post" id="token-form">
+        <label>Email:
+            <input type="text" name="email" id="email">
+        </label>
         <label>Token:
             <input type="text" name="token" id="token">
         </label>

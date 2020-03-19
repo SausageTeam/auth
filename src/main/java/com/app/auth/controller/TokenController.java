@@ -43,14 +43,11 @@ public class TokenController {
             return res;
         }
 
-        System.out.println(req.getRedirectUrl());
-
-        System.out.println(req.getToken());
-
         if (!tokenService.isValidToken(req)){
             prepareResponse(res, false, "Invalid Token");
             return res;
         }
+
         HttpSession session = httpServletRequest.getSession();
         session.setAttribute("token", "valid");
         res.setToken(req.getToken());

@@ -30,7 +30,9 @@ public class TokenServiceImpl implements TokenService {
             String createdBy = registrationToken.getCreatedBy();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             LocalDateTime expiryDate = LocalDateTime.parse(createdBy, formatter).plusHours(registrationToken.getValidDuration());
-            return expiryDate.isAfter(LocalDateTime.now());
+            boolean usable = expiryDate.isAfter(LocalDateTime.now());
+            boolean paired = registrationToken.getEmail().equals(tokenRequest.getEmail());
+            return usable && paired;
         } else {
             return false;
         }
