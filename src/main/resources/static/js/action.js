@@ -137,7 +137,7 @@ $(document).ready(function () {
             dataType: 'json',
             type: 'post',
             success: function (res) {
-                // console.log(res);
+                console.log(res);
                 if (!res.status.success) {
                     const error = $('#error');
                     error.text(res.status.errorMessage);

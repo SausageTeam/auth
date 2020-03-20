@@ -26,6 +26,7 @@ public class RegistrationController {
 
     private static final String jwtTokenCookieName = "JWT-TOKEN";
     private static final String signingKey = "signingKey";
+    private static final String defaultUrl = "http://localhost:4200/";
 
     @Autowired
     public void setRegistrationService(RegistrationService registrationService) {
@@ -40,9 +41,9 @@ public class RegistrationController {
 
     @RequestMapping(value = "/registration", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public @ResponseBody
-    RegistrationResponse token(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, RegistrationRequest req) {
-        RegistrationResponse res = new RegistrationResponse();
+    RegistrationResponse registration(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, RegistrationRequest req) {
 
+        RegistrationResponse res = new RegistrationResponse();
 
         if (req == null) {
             prepareResponse(res, false, "Unexpected Error");
@@ -53,10 +54,11 @@ public class RegistrationController {
         String token = JwtUtil.generateToken(signingKey, String.valueOf(user.getId()));
         CookieUtil.create(httpServletResponse, jwtTokenCookieName, token, false, -1, "localhost");
 
-        if (req.getRedirectUrl() == null) {
-            req.setRedirectUrl("http://localhost:4200/");
+        if (req.getRedirectUrl() == null || req.getRedirectUrl().length() == 0) {
+            res.setRedirectUrl(defaultUrl);
+        } else {
+            res.setRedirectUrl(req.getRedirectUrl());
         }
-        res.setRedirectUrl(req.getRedirectUrl());
         prepareResponse(res, true, "");
 
         return res;

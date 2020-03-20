@@ -1,8 +1,8 @@
 package com.app.auth.controller;
 
+import com.app.auth.domain.common.Status;
 import com.app.auth.domain.login.LoginRequest;
 import com.app.auth.domain.login.LoginResponse;
-import com.app.auth.domain.common.Status;
 import com.app.auth.entity.User;
 import com.app.auth.security.util.CookieUtil;
 import com.app.auth.security.util.JwtUtil;
@@ -11,11 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
 
 @Controller
 public class LoginController {
@@ -24,6 +25,7 @@ public class LoginController {
 
     private static final String jwtTokenCookieName = "JWT-TOKEN";
     private static final String signingKey = "signingKey";
+    private static final String defaultUrl = "http://localhost:4200/";
 
     @Autowired
     public void setLoginService(LoginService loginService) {
@@ -55,10 +57,11 @@ public class LoginController {
         String token = JwtUtil.generateToken(signingKey, String.valueOf(user.getId()));
         CookieUtil.create(httpServletResponse, jwtTokenCookieName, token, false, -1, "localhost");
 
-        if (req.getRedirectUrl() == null) {
-            req.setRedirectUrl("http://localhost:4200/");
+        if (req.getRedirectUrl() == null || req.getRedirectUrl().length() == 0) {
+            res.setRedirectUrl(defaultUrl);
+        } else {
+            res.setRedirectUrl(req.getRedirectUrl());
         }
-        res.setRedirectUrl(req.getRedirectUrl());
         prepareResponse(res, true, "");
 
         return res;
