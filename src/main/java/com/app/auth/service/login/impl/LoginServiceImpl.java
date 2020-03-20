@@ -1,14 +1,15 @@
-package com.app.auth.service.auth.impl;
+package com.app.auth.service.login.impl;
 
 import com.app.auth.dao.User.UserDAO;
 import com.app.auth.domain.login.LoginRequest;
-import com.app.auth.service.auth.UserService;
+import com.app.auth.entity.User;
+import com.app.auth.service.login.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class LoginServiceImpl implements LoginService {
 
     private UserDAO userDAO;
 
@@ -19,8 +20,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public boolean loginUser(LoginRequest loginRequest) {
-        return userDAO.getUser(loginRequest) != null;
+    public User loginUser(LoginRequest loginRequest) {
+        return userDAO.getUser(loginRequest.getUsername(), loginRequest.getPassword());
     }
 
 }

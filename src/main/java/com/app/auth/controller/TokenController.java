@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Controller
@@ -49,8 +48,8 @@ public class TokenController {
         }
 
         HttpSession session = httpServletRequest.getSession();
-        session.setAttribute("token", "valid");
-        res.setToken(req.getToken());
+        session.setAttribute("tokenValid", "valid");
+        session.setAttribute("token", req.getToken());
         res.setRedirectUrl("/auth/registration?redirect=" + req.getRedirectUrl());
         prepareResponse(res, true, "");
         return res;

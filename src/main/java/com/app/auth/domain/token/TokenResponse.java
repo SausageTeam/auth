@@ -10,8 +10,6 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TokenResponse {
 
-    private String token;
-
     private Status status;
 
     private String redirectUrl;

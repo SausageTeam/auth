@@ -11,15 +11,16 @@
 
 <body>
 <div>
-    <form>
+    <form method="post" id="registration-form">
         <label>Username:
             <input type="text" name="username" id="username">
         </label>
         <label>Password:
             <input type="password" name="password" id="password">
         </label>
+        <p id="error" class="col-md-10 color-red mb-0 mb-md-2 p-0" style="display:none"></p>
         <div>
-            <a href="#" class="btn btn-primary btn-block">Submit</a>
+            <button type="submit" class="btn btn-primary btn-block">Submit</button>
         </div>
     </form>
 </div>

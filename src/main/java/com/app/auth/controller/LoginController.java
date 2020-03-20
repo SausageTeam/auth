@@ -3,9 +3,10 @@ package com.app.auth.controller;
 import com.app.auth.domain.login.LoginRequest;
 import com.app.auth.domain.login.LoginResponse;
 import com.app.auth.domain.common.Status;
+import com.app.auth.entity.User;
 import com.app.auth.security.util.CookieUtil;
 import com.app.auth.security.util.JwtUtil;
-import com.app.auth.service.auth.UserService;
+import com.app.auth.service.login.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -19,15 +20,14 @@ import java.util.Map;
 @Controller
 public class LoginController {
 
-    private UserService userService;
+    private LoginService loginService;
 
     private static final String jwtTokenCookieName = "JWT-TOKEN";
     private static final String signingKey = "signingKey";
-    private static final Map<String, String> credentials = new HashMap<>();
 
     @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
+    public void setLoginService(LoginService loginService) {
+        this.loginService = loginService;
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
@@ -46,36 +46,19 @@ public class LoginController {
             return res;
         }
 
-        String username = req.getUsername();
-        String password = req.getPassword();
-        String redirectUrl = req.getRedirectUrl();
-
-        if (username == null || password == null) {
+        User user = loginService.loginUser(req);
+        if (user == null) {
             prepareResponse(res, false, "Invalid username or password");
             return res;
         }
 
-        if (redirectUrl == null) {
-            prepareResponse(res, false, "Missing redirect Url");
-            return res;
-        }
-
-        if (!credentials.containsKey(username) || !credentials.get(username).equals(password)) {
-            if (!userService.loginUser(req)) {
-                prepareResponse(res, false, "Incorrect username / password");
-                return res;
-            }
-        }
-
-        // find the match key-value pair for user, update credential
-        if (!credentials.containsKey(username)) {
-            credentials.put(username, password);
-        }
-
-        String token = JwtUtil.generateToken(signingKey, username);
+        String token = JwtUtil.generateToken(signingKey, String.valueOf(user.getId()));
         CookieUtil.create(httpServletResponse, jwtTokenCookieName, token, false, -1, "localhost");
 
-        res.setRedirectUrl(redirectUrl);
+        if (req.getRedirectUrl() == null) {
+            req.setRedirectUrl("http://localhost:4200/");
+        }
+        res.setRedirectUrl(req.getRedirectUrl());
         prepareResponse(res, true, "");
 
         return res;

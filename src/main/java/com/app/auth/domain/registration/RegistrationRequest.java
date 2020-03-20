@@ -11,8 +11,6 @@ public class RegistrationRequest {
 
     private String password;
 
-    private String token;
-
     private String redirectUrl;
 
 }

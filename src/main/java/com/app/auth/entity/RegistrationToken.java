@@ -31,7 +31,7 @@ public class RegistrationToken implements Serializable {
     @Column(name = "CREATED_BY")
     private String createdBy;
 
-    @Column(name = "ACTIVE")
-    private int active;
+    @Column(name = "ACTIVE_FLAG")
+    private int activeFlag;
 
 }

@@ -8,12 +8,6 @@ import lombok.Setter;
 @Setter
 public class RegistrationResponse {
 
-    private String username;
-
-    private String password;
-
-    private String email;
-
     private Status status;
 
     private String redirectUrl;

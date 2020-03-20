@@ -15,13 +15,13 @@ public class RegistrationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
         HttpSession session = httpServletRequest.getSession();
-        Object token = session.getAttribute("token");
-        if (token == null){
+        Object tokenValid = session.getAttribute("tokenValid");
+        if (tokenValid == null) {
             httpServletResponse.sendRedirect("login");
         } else {
-            String val = token.toString();
+            String val = tokenValid.toString();
 
-            if(!val.equals("valid")) {
+            if (!val.equals("valid")) {
                 System.out.println(val);
                 httpServletResponse.sendRedirect("login");
             } else {

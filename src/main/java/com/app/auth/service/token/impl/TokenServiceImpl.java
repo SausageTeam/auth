@@ -1,7 +1,6 @@
 package com.app.auth.service.token.impl;
 
 import com.app.auth.dao.RegistrationToken.RegistrationTokenDAO;
-import com.app.auth.domain.token.Token;
 import com.app.auth.domain.token.TokenRequest;
 import com.app.auth.entity.RegistrationToken;
 import com.app.auth.service.token.TokenService;
@@ -25,14 +24,18 @@ public class TokenServiceImpl implements TokenService {
     @Override
     @Transactional
     public boolean isValidToken(TokenRequest tokenRequest) {
-        RegistrationToken registrationToken = registrationTokenDAO.getRegistrationToken(tokenRequest);
+        String token = tokenRequest.getToken();
+        String email = tokenRequest.getEmail();
+
+        RegistrationToken registrationToken = registrationTokenDAO.getRegistrationToken(token);
         if (registrationToken != null) {
             String createdBy = registrationToken.getCreatedBy();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             LocalDateTime expiryDate = LocalDateTime.parse(createdBy, formatter).plusHours(registrationToken.getValidDuration());
             boolean usable = expiryDate.isAfter(LocalDateTime.now());
-            boolean paired = registrationToken.getEmail().equals(tokenRequest.getEmail());
-            return usable && paired;
+            boolean paired = registrationToken.getEmail().equals(email);
+            boolean active = registrationToken.getActiveFlag() == 1;
+            return usable && paired && active;
         } else {
             return false;
         }
