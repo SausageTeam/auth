@@ -1,11 +1,13 @@
 package com.app.auth.domain.login;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
-public class LoginRequest {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class LoginPostRequest {
 
     private String username;
 

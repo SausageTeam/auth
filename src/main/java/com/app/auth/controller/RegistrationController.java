@@ -1,8 +1,10 @@
 package com.app.auth.controller;
 
-import com.app.auth.domain.common.Status;
-import com.app.auth.domain.registration.RegistrationRequest;
-import com.app.auth.domain.registration.RegistrationResponse;
+import com.app.auth.domain.common.GenericResponse;
+import com.app.auth.domain.common.ServiceStatus;
+import com.app.auth.domain.registration.Registration;
+import com.app.auth.domain.registration.RegistrationPostRequest;
+import com.app.auth.domain.registration.RegistrationPostResponse;
 import com.app.auth.entity.User;
 import com.app.auth.security.util.CookieUtil;
 import com.app.auth.security.util.JwtUtil;
@@ -11,60 +13,67 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import static com.app.auth.constant.Constant.*;
 
 @Controller
+@RequestMapping(value = "/registration")
 public class RegistrationController {
 
     private RegistrationService registrationService;
-
-    private static final String jwtTokenCookieName = "JWT-TOKEN";
-    private static final String signingKey = "signingKey";
-    private static final String defaultUrl = "http://localhost:4200/";
 
     @Autowired
     public void setRegistrationService(RegistrationService registrationService) {
         this.registrationService = registrationService;
     }
 
-    @RequestMapping(value = "/registration", method = RequestMethod.GET)
+    @GetMapping
     public String registration(Model model, @RequestParam("redirect") String redirect) {
         model.addAttribute("redirect", redirect);
         return "registration";
     }
 
-    @RequestMapping(value = "/registration", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public @ResponseBody
-    RegistrationResponse registration(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, RegistrationRequest req) {
+    RegistrationPostResponse registration(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, RegistrationPostRequest registrationPostRequest) {
+        RegistrationPostResponse registrationPostResponse = new RegistrationPostResponse();
 
-        RegistrationResponse res = new RegistrationResponse();
-
-        if (req == null) {
-            prepareResponse(res, false, "Unexpected Error");
-            return res;
-        }
-
-        User user = registrationService.registerUser(httpServletRequest, req);
-        String token = JwtUtil.generateToken(signingKey, String.valueOf(user.getId()));
-        CookieUtil.create(httpServletResponse, jwtTokenCookieName, token, false, -1, "localhost");
-
-        if (req.getRedirectUrl() == null || req.getRedirectUrl().length() == 0) {
-            res.setRedirectUrl(defaultUrl);
+        if (registrationPostRequest == null) {
+            prepareResponse(registrationPostResponse, false, "Unexpected Error");
         } else {
-            res.setRedirectUrl(req.getRedirectUrl());
+            Registration registration = Registration.builder()
+                    .username(registrationPostRequest.getUsername())
+                    .password(registrationPostRequest.getPassword())
+                    .redirectUrl(registrationPostRequest.getRedirectUrl())
+                    .build();
+            HttpSession session = httpServletRequest.getSession();
+            String aesToken = String.valueOf(session.getAttribute("aesToken"));
+            User user = registrationService.registerUser(aesToken, registration);
+
+            if (user == null) {
+                prepareResponse(registrationPostResponse, false, "Invalid token");
+            } else {
+                String jwtToken = JwtUtil.generateToken(SIGNING_KEY, String.valueOf(user.getId()));
+                CookieUtil.create(httpServletResponse, JWT_TOKEN_COOKIE_NAME, jwtToken, false, -1, "localhost");
+
+                if (registration.getRedirectUrl() == null || registration.getRedirectUrl().length() == 0) {
+                    registrationPostResponse.setRedirectUrl(DEFAULT_URL);
+                } else {
+                    registrationPostResponse.setRedirectUrl(registration.getRedirectUrl());
+                }
+                prepareResponse(registrationPostResponse, true, "");
+            }
         }
-        prepareResponse(res, true, "");
-
-        return res;
+        return registrationPostResponse;
     }
 
-    private void prepareResponse(RegistrationResponse response, boolean success, String errorMessage) {
-        response.setStatus(new Status(success, success ? "SUCCESS" : "FAILED", errorMessage));
+    private void prepareResponse(GenericResponse response, boolean success, String errorMessage) {
+        response.setServiceStatus(new ServiceStatus(success ? "SUCCESS" : "FAILED", success, errorMessage));
     }
+
 }

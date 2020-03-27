@@ -32,7 +32,7 @@ public class UserDAOImpl extends AbstractHibernateDAO<User> implements UserDAO {
     }
 
     @Override
-    public User updateUser(User user) {
+    public User setUser(User user) {
         Session session = getCurrentSession();
         return (User) session.merge(user);
     }

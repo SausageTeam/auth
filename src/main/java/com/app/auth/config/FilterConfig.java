@@ -14,7 +14,7 @@ public class FilterConfig {
     public FilterRegistrationBean<RegistrationFilter> jwtFilter() {
         final FilterRegistrationBean<RegistrationFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new RegistrationFilter());
-        registrationBean.setInitParameters(Collections.singletonMap("token", "invalid"));
+//        registrationBean.setInitParameters(Collections.singletonMap("token", "invalid"));
         registrationBean.addUrlPatterns("/auth/registration");
 
         return registrationBean;

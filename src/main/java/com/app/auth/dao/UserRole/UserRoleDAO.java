@@ -4,6 +4,6 @@ import com.app.auth.entity.UserRole;
 
 public interface UserRoleDAO {
 
-    UserRole updateUserRole(UserRole userRole);
+    UserRole setUserRole(UserRole userRole);
 
 }

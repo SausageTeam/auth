@@ -16,7 +16,7 @@
             <input type="text" name="email" id="email">
         </label>
         <label>Token:
-            <input type="text" name="token" id="token">
+            <input type="text" name="aesToken" id="aesToken">
         </label>
         <p id="error" class="col-md-10 color-red mb-0 mb-md-2 p-0" style="display:none"></p>
         <div>

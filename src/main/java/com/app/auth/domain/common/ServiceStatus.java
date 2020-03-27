@@ -1,14 +1,19 @@
 package com.app.auth.domain.common;
 
+import lombok.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
+@Setter
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
-public class Status {
-    private boolean success;
+public class ServiceStatus {
+
     private String statusCode;
+    private boolean success;
     private String errorMessage;
 }

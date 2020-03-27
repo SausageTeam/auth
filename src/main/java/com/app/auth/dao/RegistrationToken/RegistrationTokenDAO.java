@@ -6,6 +6,6 @@ public interface RegistrationTokenDAO {
 
     RegistrationToken getRegistrationToken(String token);
 
-    void updateInvalidRegistrationToken(int id);
+    void setRegistrationToken(RegistrationToken registrationToken);
 
 }

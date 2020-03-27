@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 public class PersonDAOImpl extends AbstractHibernateDAO<Person> implements PersonDAO {
 
     @Override
-    public Person updatePerson(Person person) {
+    public Person setPerson(Person person) {
         Session session = getCurrentSession();
         return (Person) session.merge(person);
     }
