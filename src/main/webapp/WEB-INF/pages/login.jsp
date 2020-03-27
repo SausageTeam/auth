@@ -53,9 +53,10 @@
 
             <div class="form-group row pt-1">
                 <span class="col-md-1"></span>
-                <div class="col-md-9">
+                <div class="col-md-10">
                     <a href="token?redirect=${redirect}" class="btn btn-primary btn-block">Register</a>
                 </div>
+                <span class="col-md-1"></span>
             </div>
         </form>
     </div>
