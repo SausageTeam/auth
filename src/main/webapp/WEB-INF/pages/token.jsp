@@ -34,6 +34,7 @@
         </div>
 
         <div class="p-3 bottom-split-line">
+
           <div class="form-group">
             <label for="email" class="color-dark">Email:</label>
             <input class="form-control" type="text" name="email" id="email">
@@ -45,6 +46,7 @@
           </div>
 
           <p id="error" class="col-md-10 color-red mb-0 mb-md-2 p-0" style="display:none"></p>
+
         </div>
 
         <div class="p-3">
