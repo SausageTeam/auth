@@ -1,40 +1,63 @@
 package com.app.auth.service.registration.impl;
 
+import com.app.auth.dao.ApplicationWorkFlow.ApplicationWorkFlowDAO;
+import com.app.auth.dao.Employee.EmployeeDAO;
 import com.app.auth.dao.Person.PersonDAO;
 import com.app.auth.dao.RegistrationToken.RegistrationTokenDAO;
 import com.app.auth.dao.Role.RoleDAO;
 import com.app.auth.dao.Role.enums.RoleEnums;
 import com.app.auth.dao.User.UserDAO;
 import com.app.auth.dao.UserRole.UserRoleDAO;
-import com.app.auth.domain.registration.RegistrationRequest;
+import com.app.auth.domain.registration.Registration;
 import com.app.auth.entity.*;
+import com.app.auth.security.util.AES;
 import com.app.auth.service.registration.RegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+import static com.app.auth.constant.Constant.*;
+import static com.app.auth.constant.enums.ApplicationWorkFlow.ApplicationWorkFlowOnboardingEnums.PROCESSING;
+import static com.app.auth.dao.ApplicationWorkFlow.enums.ApplicationWorkFlowStatusEnums.ONBOARDING;
 
 @Service
 public class RegistrationServiceImpl implements RegistrationService {
 
     private UserDAO userDAO;
 
+    private PersonDAO personDAO;
+
+    private EmployeeDAO employeeDAO;
+
+    private ApplicationWorkFlowDAO applicationWorkFlowDAO;
+
     private RoleDAO roleDAO;
 
     private UserRoleDAO userRoleDAO;
-
-
-    private PersonDAO personDAO;
 
     private RegistrationTokenDAO registrationTokenDAO;
 
     @Autowired
     public void setUserDAO(UserDAO userDAO) {
         this.userDAO = userDAO;
+    }
+
+    @Autowired
+    public void setPersonDAO(PersonDAO personDAO) {
+        this.personDAO = personDAO;
+    }
+
+    @Autowired
+    public void setEmployeeDAO(EmployeeDAO employeeDAO) {
+        this.employeeDAO = employeeDAO;
+    }
+
+    @Autowired
+    public void setApplicationWorkFlowDAO(ApplicationWorkFlowDAO applicationWorkFlowDAO) {
+        this.applicationWorkFlowDAO = applicationWorkFlowDAO;
     }
 
     @Autowired
@@ -48,68 +71,74 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Autowired
-    public void setPersonDAO(PersonDAO personDAO) {
-        this.personDAO = personDAO;
-    }
-
-    @Autowired
-    public void setRoleDAO(RegistrationTokenDAO registrationTokenDAO) {
+    public void setRegistrationTokenDAO(RegistrationTokenDAO registrationTokenDAO) {
         this.registrationTokenDAO = registrationTokenDAO;
-    }
-
-
-    private Person updatePerson(String email){
-        Person person = new Person();
-        person.setEmail(email);
-        return personDAO.updatePerson(person);
-    }
-
-    private User updateUser(String username, String password, String email, Person person, String createDate, String ModificationDate) {
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(password);
-        user.setEmail(email);
-        user.setPerson(person);
-        user.setCreateDate(createDate);
-        user.setModificationDate(ModificationDate);
-        return userDAO.updateUser(user);
-    }
-
-    private void updateUserRole(User user, Role role, String createDate, String ModificationDate) {
-        UserRole userRole = new UserRole();
-        userRole.setUser(user);
-        userRole.setRole(role);
-        userRole.setActiveFlag(1);
-        userRole.setCreateDate(createDate);
-        userRole.setModificationDate(ModificationDate);
-        userRole.setLastModificationUser(0);
-        userRoleDAO.updateUserRole(userRole);
     }
 
     @Override
     @Transactional
-    public User registerUser(HttpServletRequest httpServletRequest, RegistrationRequest registrationRequest) {
-        String username = registrationRequest.getUsername();
-        String password = registrationRequest.getPassword();
-        HttpSession session = httpServletRequest.getSession();
-        String token = (String) session.getAttribute("token");
+    public User registerUser(String aesToken, Registration registration) {
+        User user = null;
+
+        String username = registration.getUsername();
+        String password = registration.getPassword();
 
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter format = DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT);
         String formatDateTime = now.format(format);
 
-        RegistrationToken registrationToken = registrationTokenDAO.getRegistrationToken(token);
-        String email = registrationToken.getEmail();
-        registrationTokenDAO.updateInvalidRegistrationToken(registrationToken.getId());
+        String decryptToken = AES.decrypt(aesToken, SECRET_KEY);
+        if (decryptToken != null) {
+            String[] arr_decryptToken = decryptToken.split(" ");
+            String email = arr_decryptToken[0];
+            String title = arr_decryptToken[1];
+            String startDate = arr_decryptToken[2];
+            String endDate = arr_decryptToken[3];
 
-        Person person = updatePerson(email);
+            Person person = Person.builder()
+                    .email(email).build();
+            person = personDAO.setPerson(person);
 
-        User user = updateUser(username, password, email, person, formatDateTime, formatDateTime);
+            user = User.builder()
+                    .username(username)
+                    .password(password)
+                    .person(person)
+                    .createdDateTime(formatDateTime)
+                    .modificationDateTime(formatDateTime)
+                    .build();
+            user = userDAO.setUser(user);
 
-        Role role = roleDAO.getRoleById(RoleEnums.EMPLOYEE.getValue());
+            Employee employee = Employee.builder()
+                    .title(title)
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .build();
+            employee = employeeDAO.setEmployee(employee);
 
-        updateUserRole(user, role, formatDateTime, formatDateTime);
+            ApplicationWorkFlow applicationWorkFlow = ApplicationWorkFlow.builder()
+                    .employee(employee)
+                    .status(PROCESSING.getValue())
+                    .type(ONBOARDING.getStr())
+                    .createdDateTime(formatDateTime)
+                    .modificationDateTime(formatDateTime)
+                    .build();
+            applicationWorkFlowDAO.setApplicationWorkFlow(applicationWorkFlow);
 
+            Role role = roleDAO.getRoleById(RoleEnums.EMPLOYEE.getValue());
+            UserRole userRole = UserRole.builder()
+                    .user(user)
+                    .role(role)
+                    .activeFlag(ACTIVE_FLAG)
+                    .createdDateTime(formatDateTime)
+                    .modificationDateTime(formatDateTime)
+                    .lastModificationUser(user.getId())
+                    .build();
+            userRoleDAO.setUserRole(userRole);
+
+            RegistrationToken registrationToken = registrationTokenDAO.getRegistrationToken(aesToken);
+            registrationToken.setActiveFlag(0);
+            registrationTokenDAO.setRegistrationToken(registrationToken);
+        }
         return user;
     }
 }

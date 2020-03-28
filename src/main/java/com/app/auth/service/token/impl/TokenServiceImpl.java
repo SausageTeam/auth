@@ -1,7 +1,8 @@
 package com.app.auth.service.token.impl;
 
 import com.app.auth.dao.RegistrationToken.RegistrationTokenDAO;
-import com.app.auth.domain.token.TokenRequest;
+import com.app.auth.domain.token.Token;
+import com.app.auth.domain.token.TokenPostRequest;
 import com.app.auth.entity.RegistrationToken;
 import com.app.auth.service.token.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+import static com.app.auth.constant.Constant.DEFAULT_DATE_TIME_FORMAT;
 
 @Service
 public class TokenServiceImpl implements TokenService {
@@ -23,15 +26,14 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     @Transactional
-    public boolean isValidToken(TokenRequest tokenRequest) {
-        String token = tokenRequest.getToken();
-        String email = tokenRequest.getEmail();
-
-        RegistrationToken registrationToken = registrationTokenDAO.getRegistrationToken(token);
+    public boolean isValidToken(Token token) {
+        String aesToken = token.getAesToken();
+        String email = token.getEmail();
+        RegistrationToken registrationToken = registrationTokenDAO.getRegistrationToken(aesToken);
         if (registrationToken != null) {
-            String createdBy = registrationToken.getCreatedBy();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-            LocalDateTime expiryDate = LocalDateTime.parse(createdBy, formatter).plusHours(registrationToken.getValidDuration());
+            String createDateTime = registrationToken.getCreatedDateTime();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT);
+            LocalDateTime expiryDate = LocalDateTime.parse(createDateTime, formatter).plusHours(registrationToken.getValidDuration());
             boolean usable = expiryDate.isAfter(LocalDateTime.now());
             boolean paired = registrationToken.getEmail().equals(email);
             boolean active = registrationToken.getActiveFlag() == 1;

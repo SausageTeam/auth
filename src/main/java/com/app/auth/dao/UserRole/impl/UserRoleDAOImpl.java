@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 public class UserRoleDAOImpl extends AbstractHibernateDAO<UserRole> implements UserRoleDAO {
 
     @Override
-    public UserRole updateUserRole(UserRole userRole) {
+    public UserRole setUserRole(UserRole userRole) {
         Session session = getCurrentSession();
         return (UserRole) session.merge(userRole);
     }

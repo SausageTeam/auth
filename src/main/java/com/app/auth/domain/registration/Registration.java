@@ -1,11 +1,13 @@
 package com.app.auth.domain.registration;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
-public class RegistrationRequest {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Registration {
 
     private String username;
 

@@ -1,8 +1,10 @@
 package com.app.auth.controller;
 
-import com.app.auth.domain.common.Status;
-import com.app.auth.domain.login.LoginRequest;
-import com.app.auth.domain.login.LoginResponse;
+import com.app.auth.domain.common.GenericResponse;
+import com.app.auth.domain.common.ServiceStatus;
+import com.app.auth.domain.login.Login;
+import com.app.auth.domain.login.LoginPostRequest;
+import com.app.auth.domain.login.LoginPostResponse;
 import com.app.auth.entity.User;
 import com.app.auth.security.util.CookieUtil;
 import com.app.auth.security.util.JwtUtil;
@@ -11,63 +13,61 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 
+import static com.app.auth.constant.Constant.*;
+
 @Controller
+@RequestMapping(value = "/login")
 public class LoginController {
 
     private LoginService loginService;
-
-    private static final String jwtTokenCookieName = "JWT-TOKEN";
-    private static final String signingKey = "signingKey";
-    private static final String defaultUrl = "http://localhost:4200/";
 
     @Autowired
     public void setLoginService(LoginService loginService) {
         this.loginService = loginService;
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String login(Model model, @RequestParam(required = false) String redirect) {
+    @GetMapping
+    public String getLogin(Model model, @RequestParam(required = false) String redirect) {
         model.addAttribute("redirect", redirect);
         return "login";
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public @ResponseBody
-    LoginResponse login(HttpServletResponse httpServletResponse, LoginRequest req) {
-        LoginResponse res = new LoginResponse();
+    LoginPostResponse postLogin(HttpServletResponse httpServletResponse, LoginPostRequest loginPostRequest) {
+        LoginPostResponse loginPostResponse = new LoginPostResponse();
 
-        if (req == null) {
-            prepareResponse(res, false, "Unexpected Error");
-            return res;
+        if (loginPostRequest == null) {
+            prepareResponse(loginPostResponse, false, "Unexpected Error");
+        }else {
+            Login login = Login.builder()
+                    .username(loginPostRequest.getUsername())
+                    .password(loginPostRequest.getPassword())
+                    .redirectUrl(loginPostRequest.getRedirectUrl())
+                    .build();
+            User user = loginService.loginUser(login);
+            if (user == null) {
+                prepareResponse(loginPostResponse, false, "Invalid username or password");
+                return loginPostResponse;
+            }
+            String token = JwtUtil.generateToken(SIGNING_KEY, String.valueOf(user.getId()));
+            CookieUtil.create(httpServletResponse, JWT_TOKEN_COOKIE_NAME, token, false, -1, "localhost");
+
+            if (login.getRedirectUrl() == null || login.getRedirectUrl().length() == 0) {
+                loginPostResponse.setRedirectUrl(DEFAULT_URL);
+            } else {
+                loginPostResponse.setRedirectUrl(login.getRedirectUrl());
+            }
+            prepareResponse(loginPostResponse, true, "");
         }
-
-        User user = loginService.loginUser(req);
-        if (user == null) {
-            prepareResponse(res, false, "Invalid username or password");
-            return res;
-        }
-
-        String token = JwtUtil.generateToken(signingKey, String.valueOf(user.getId()));
-        CookieUtil.create(httpServletResponse, jwtTokenCookieName, token, false, -1, "localhost");
-
-        if (req.getRedirectUrl() == null || req.getRedirectUrl().length() == 0) {
-            res.setRedirectUrl(defaultUrl);
-        } else {
-            res.setRedirectUrl(req.getRedirectUrl());
-        }
-        prepareResponse(res, true, "");
-
-        return res;
+        return loginPostResponse;
     }
 
-    private void prepareResponse(LoginResponse response, boolean success, String errorMessage) {
-        response.setStatus(new Status(success, success ? "SUCCESS" : "FAILED", errorMessage));
+    private void prepareResponse(GenericResponse response, boolean success, String errorMessage) {
+        response.setServiceStatus(new ServiceStatus(success ? "SUCCESS" : "FAILED", success, errorMessage));
     }
 }

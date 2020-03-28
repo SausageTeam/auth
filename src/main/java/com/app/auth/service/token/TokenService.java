@@ -1,9 +1,9 @@
 package com.app.auth.service.token;
 
-import com.app.auth.domain.token.TokenRequest;
+import com.app.auth.domain.token.Token;
 
 public interface TokenService {
 
-    boolean isValidToken(TokenRequest tokenRequest);
+    boolean isValidToken(Token token);
 
 }

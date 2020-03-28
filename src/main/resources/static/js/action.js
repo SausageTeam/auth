@@ -37,9 +37,9 @@ $(document).ready(function () {
             type: 'post',
             success: function (res) {
                 // console.log(res);
-                if (!res.status.success) {
+                if (!res.serviceStatus.success) {
                     const error = $('#error');
-                    error.text(res.status.errorMessage);
+                    error.text(res.serviceStatus.errorMessage);
                     error.show();
                 } else {
                     window.location = res.redirectUrl;
@@ -88,9 +88,9 @@ $(document).ready(function () {
             type: 'post',
             success: function (res) {
                 // console.log(res);
-                if (!res.status.success) {
+                if (!res.serviceStatus.success) {
                     const error = $('#error');
-                    error.text(res.status.errorMessage);
+                    error.text(res.serviceStatus.errorMessage);
                     error.show();
                 } else {
                     window.location = res.redirectUrl;
@@ -138,9 +138,9 @@ $(document).ready(function () {
             type: 'post',
             success: function (res) {
                 console.log(res);
-                if (!res.status.success) {
+                if (!res.serviceStatus.success) {
                     const error = $('#error');
-                    error.text(res.status.errorMessage);
+                    error.text(res.serviceStatus.errorMessage);
                     error.show();
                 } else {
                     window.location = res.redirectUrl;

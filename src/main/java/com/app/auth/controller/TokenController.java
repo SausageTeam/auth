@@ -1,62 +1,65 @@
 package com.app.auth.controller;
 
-import com.app.auth.domain.common.Status;
-import com.app.auth.domain.token.TokenRequest;
-import com.app.auth.domain.token.TokenResponse;
+import com.app.auth.domain.common.GenericResponse;
+import com.app.auth.domain.common.ServiceStatus;
+import com.app.auth.domain.token.Token;
+import com.app.auth.domain.token.TokenPostRequest;
+import com.app.auth.domain.token.TokenPostResponse;
 import com.app.auth.service.token.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Controller
+@RequestMapping(value = "/token")
 public class TokenController {
 
     private TokenService tokenService;
 
     @Autowired
-    public void setTokenService (TokenService tokenService){
+    public void setTokenService(TokenService tokenService) {
         this.tokenService = tokenService;
     }
 
-    @RequestMapping(value = "/token", method = RequestMethod.GET)
-    public String token(Model model, @RequestParam("redirect") String redirect) {
+    @GetMapping
+    public String getToken(Model model, @RequestParam("redirect") String redirect) {
         model.addAttribute("redirect", redirect);
         return "token";
     }
 
-    @RequestMapping(value = "/token", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public @ResponseBody TokenResponse token(HttpServletRequest httpServletRequest, TokenRequest req) {
+    @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public @ResponseBody
+    TokenPostResponse postToken(HttpServletRequest httpServletRequest, TokenPostRequest tokenPostRequest) {
 
-        TokenResponse res = new TokenResponse();
+        TokenPostResponse tokenPostResponse = new TokenPostResponse();
 
-        if (req == null) {
-            prepareResponse(res, false, "Unexpected Error");
-            return res;
+        if (tokenPostRequest == null) {
+            prepareResponse(tokenPostResponse, false, "Unexpected Error");
+        } else {
+            Token token = Token.builder()
+                    .aesToken(tokenPostRequest.getAesToken())
+                    .email(tokenPostRequest.getEmail())
+                    .redirectUrl(tokenPostRequest.getRedirectUrl())
+                    .build();
+            if (!tokenService.isValidToken(token)) {
+                prepareResponse(tokenPostResponse, false, "Invalid Token");
+            } else {
+                HttpSession session = httpServletRequest.getSession();
+                session.setAttribute("aesToken", token.getAesToken());
+                tokenPostResponse.setRedirectUrl("/auth/registration?redirect=" + token.getRedirectUrl());
+                prepareResponse(tokenPostResponse, true, "");
+            }
         }
-
-        if (!tokenService.isValidToken(req)){
-            prepareResponse(res, false, "Invalid Token");
-            return res;
-        }
-
-        HttpSession session = httpServletRequest.getSession();
-        session.setAttribute("tokenValid", "valid");
-        session.setAttribute("token", req.getToken());
-        res.setRedirectUrl("/auth/registration?redirect=" + req.getRedirectUrl());
-        prepareResponse(res, true, "");
-        return res;
+        return tokenPostResponse;
     }
 
-    private void prepareResponse(TokenResponse response, boolean success, String errorMessage) {
-        response.setStatus(new Status(success, success ? "SUCCESS" : "FAILED", errorMessage));
+    private void prepareResponse(GenericResponse response, boolean success, String errorMessage) {
+        response.setServiceStatus(new ServiceStatus(success ? "SUCCESS" : "FAILED", success, errorMessage));
     }
 
 }

@@ -1,7 +1,7 @@
 package com.app.auth.service.login.impl;
 
 import com.app.auth.dao.User.UserDAO;
-import com.app.auth.domain.login.LoginRequest;
+import com.app.auth.domain.login.Login;
 import com.app.auth.entity.User;
 import com.app.auth.service.login.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +20,8 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     @Transactional
-    public User loginUser(LoginRequest loginRequest) {
-        return userDAO.getUser(loginRequest.getUsername(), loginRequest.getPassword());
+    public User loginUser(Login login) {
+        return userDAO.getUser(login.getUsername(), login.getPassword());
     }
 
 }
