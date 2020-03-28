@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static com.app.auth.constant.Constant.ACTIVE_FLAG;
 import static com.app.auth.constant.Constant.SECRET_KEY;
+import static com.app.auth.constant.enums.ApplicationWorkFlow.ApplicationWorkFlowOnboardingEnums.PROCESSING;
 import static com.app.auth.dao.ApplicationWorkFlow.enums.ApplicationWorkFlowStatusEnums.ONBOARDING;
 
 @Service
@@ -83,7 +85,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         String password = registration.getPassword();
 
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formatDateTime = now.format(format);
 
         String decryptToken = AES.decrypt(aesToken, SECRET_KEY);
@@ -102,8 +104,8 @@ public class RegistrationServiceImpl implements RegistrationService {
                     .username(username)
                     .password(password)
                     .person(person)
-                    .createDate(formatDateTime)
-                    .modificationDate(formatDateTime)
+                    .createdDateTime(formatDateTime)
+                    .modificationDateTime(formatDateTime)
                     .build();
             user = userDAO.setUser(user);
 
@@ -116,10 +118,10 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             ApplicationWorkFlow applicationWorkFlow = ApplicationWorkFlow.builder()
                     .employee(employee)
-                    .createdDate(formatDateTime)
-                    .modificationDate(formatDateTime)
-                    .status(ONBOARDING.getValue())
-                    .type("Onboarding")
+                    .status(PROCESSING.getValue())
+                    .type(ONBOARDING.getStr())
+                    .createdDateTime(formatDateTime)
+                    .modificationDateTime(formatDateTime)
                     .build();
             applicationWorkFlowDAO.setApplicationWorkFlow(applicationWorkFlow);
 
@@ -127,8 +129,10 @@ public class RegistrationServiceImpl implements RegistrationService {
             UserRole userRole = UserRole.builder()
                     .user(user)
                     .role(role)
-                    .createDate(formatDateTime)
-                    .modificationDate(formatDateTime)
+                    .activeFlag(ACTIVE_FLAG)
+                    .createdDateTime(formatDateTime)
+                    .modificationDateTime(formatDateTime)
+                    .lastModificationUser(user.getId())
                     .build();
             userRoleDAO.setUserRole(userRole);
 

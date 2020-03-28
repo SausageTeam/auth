@@ -29,8 +29,8 @@ public class TokenServiceImpl implements TokenService {
         String email = token.getEmail();
         RegistrationToken registrationToken = registrationTokenDAO.getRegistrationToken(aesToken);
         if (registrationToken != null) {
-            String createDateTime = registrationToken.getCreateDateTime();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            String createDateTime = registrationToken.getCreatedDateTime();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime expiryDate = LocalDateTime.parse(createDateTime, formatter).plusHours(registrationToken.getValidDuration());
             boolean usable = expiryDate.isAfter(LocalDateTime.now());
             boolean paired = registrationToken.getEmail().equals(email);
