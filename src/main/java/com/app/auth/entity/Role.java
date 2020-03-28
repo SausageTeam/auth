@@ -25,11 +25,11 @@ public class Role implements Serializable {
     @Column(name = "DESCRIPTION")
     private String description;
 
-    @Column(name = "CREATE_DATE")
-    private String createDate;
+    @Column(name = "CREATED_DATE_TIME")
+    private String createdDateTime;
 
-    @Column(name = "MODIFICATION_DATE")
-    private String modificationDate;
+    @Column(name = "MODIFICATION_DATE_TIME")
+    private String modificationDateTime;
 
     @Column(name = "LAST_MODIFICATION_USER")
     private int lastModificationUser;
