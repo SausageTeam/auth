@@ -151,7 +151,7 @@ input[type=date].form-control.active, input[type=date].form-control:focus {
 /******************************************/
 /* login page */
 
-.bg-container {
+.bg-container, .page-bg-container {
     height: 40%;
     background-color: #003282;
     z-index: 1;
@@ -161,9 +161,17 @@ input[type=date].form-control.active, input[type=date].form-control:focus {
     margin-top: 5rem !important;
 }
 
+.page-bg-container > div {
+    margin-top: 3rem !important;
+}
+
 @media ( max-width : 768px) {
     .bg-container > div {
         margin-top: 7rem !important;
+    }
+
+    .page-bg-container > div {
+        margin-top: 5rem !important;
     }
 }
 
@@ -204,6 +212,15 @@ input[type=date].form-control.active, input[type=date].form-control:focus {
     font-weight: bold;
     line-height: 48px;
     border-bottom: 4px solid #3EC5F2;
+}
+
+.page-title {
+    font-weight: bold;
+    line-height: 32px;
+}
+
+.page-desc {
+    font-size: 11px;
 }
 
 .register-link {

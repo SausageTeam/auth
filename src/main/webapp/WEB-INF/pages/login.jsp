@@ -19,7 +19,6 @@
         <p class="m-0 subtitle">Onboarding System</p>
       </div>
     </div>
-
   </div>
 
   <div class="container-fluid d-flex m-auto">
@@ -66,7 +65,7 @@
         <div class="form-group row pt-1">
           <span class="col-md-1"></span>
           <div class="col-md-10 d-flex justify-content-center align-items-center">
-            <span class="register-link mr-1 color-dark">Not a user?</span>
+            <span class="register-link mr-2 color-dark">Not a user?</span>
             <a href="token?redirect=${redirect}" class="register-link">Register Here</a>
           </div>
           <span class="col-md-1"></span>
