@@ -168,7 +168,7 @@ input[type=date].form-control.active, input[type=date].form-control:focus {
 }
 
 .logo {
-    width: 32px;
+    width: 36px;
     margin-right: 10px;
 }
 
@@ -179,12 +179,12 @@ input[type=date].form-control.active, input[type=date].form-control:focus {
 .title {
     font-family: 'Bitter', serif;
     font-weight: bold;
-    font-size: 20px;
+    font-size: 22px;
 }
 
 .subtitle {
     font-family: 'Open Sans Condensed', sans-serif;
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 2px;
 }
 
