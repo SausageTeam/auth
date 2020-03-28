@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static com.app.auth.constant.Constant.DEFAULT_DATE_TIME_FORMAT;
+
 @Service
 public class TokenServiceImpl implements TokenService {
 
@@ -29,8 +31,8 @@ public class TokenServiceImpl implements TokenService {
         String email = token.getEmail();
         RegistrationToken registrationToken = registrationTokenDAO.getRegistrationToken(aesToken);
         if (registrationToken != null) {
-            String createDateTime = registrationToken.getCreateDateTime();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            String createDateTime = registrationToken.getCreatedDateTime();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT);
             LocalDateTime expiryDate = LocalDateTime.parse(createDateTime, formatter).plusHours(registrationToken.getValidDuration());
             boolean usable = expiryDate.isAfter(LocalDateTime.now());
             boolean paired = registrationToken.getEmail().equals(email);
