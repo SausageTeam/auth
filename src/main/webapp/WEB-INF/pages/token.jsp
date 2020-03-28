@@ -45,7 +45,7 @@
             <input class="form-control" type="text" name="aesToken" id="aesToken">
           </div>
 
-          <p id="error" class="col-md-10 color-red mb-0 mb-md-2 p-0" style="display:none"></p>
+          <p id="error" class="col-md-10 color-red mb-0 p-0" style="display:none"></p>
 
         </div>
 
