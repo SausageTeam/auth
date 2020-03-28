@@ -5,18 +5,16 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Collections;
+@Configuration
+public class FilterConfig {
 
-//@Configuration
-//public class FilterConfig {
-//
-//    @Bean
-//    public FilterRegistrationBean<RegistrationFilter> jwtFilter() {
-//        final FilterRegistrationBean<RegistrationFilter> registrationBean = new FilterRegistrationBean<>();
-//        registrationBean.setFilter(new RegistrationFilter());
-////        registrationBean.setInitParameters(Collections.singletonMap("token", "invalid"));
-//        registrationBean.addUrlPatterns("/auth/registration");
-//
-//        return registrationBean;
-//    }
-//}
+    @Bean
+    public FilterRegistrationBean<RegistrationFilter> jwtFilter() {
+        final FilterRegistrationBean<RegistrationFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new RegistrationFilter());
+        registrationBean.addUrlPatterns("/auth/registration");
+
+        return registrationBean;
+    }
+}
+
