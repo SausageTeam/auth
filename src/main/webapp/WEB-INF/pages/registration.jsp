@@ -6,7 +6,7 @@
 <html>
 <head>
     <%@include file="common/head.jsp" %>
-    <title>Registration</title>
+    <title>Sausage Fire | Registration</title>
 </head>
 
 <body>

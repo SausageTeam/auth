@@ -6,7 +6,7 @@
 <html>
 <head>
     <%@include file="common/head.jsp" %>
-    <title>Token</title>
+    <title>Sausage Fire | Token</title>
 </head>
 
 <body>
