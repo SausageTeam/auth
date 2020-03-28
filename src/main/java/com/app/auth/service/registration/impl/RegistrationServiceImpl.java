@@ -19,8 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static com.app.auth.constant.Constant.ACTIVE_FLAG;
-import static com.app.auth.constant.Constant.SECRET_KEY;
+import static com.app.auth.constant.Constant.*;
 import static com.app.auth.constant.enums.ApplicationWorkFlow.ApplicationWorkFlowOnboardingEnums.PROCESSING;
 import static com.app.auth.dao.ApplicationWorkFlow.enums.ApplicationWorkFlowStatusEnums.ONBOARDING;
 
@@ -85,7 +84,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         String password = registration.getPassword();
 
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter format = DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT);
         String formatDateTime = now.format(format);
 
         String decryptToken = AES.decrypt(aesToken, SECRET_KEY);
